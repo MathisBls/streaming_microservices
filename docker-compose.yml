@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  api-gateway:
+    build: .
+    command: node api-gateway.js
+    ports:
+      - "3000:3000"
+    depends_on:
+      - users-service
+      - video-processing-service
+      - streaming-service
+
+  users-service:
+    build: ./users-service
+    command: node index.js
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+
+  video-processing-service:
+    build: ./video-processing-service
+    command: node index.js
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+
+  streaming-service:
+    build: ./streaming-service
+    command: node index.js
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development

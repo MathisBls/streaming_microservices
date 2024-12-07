@@ -2,6 +2,28 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/users.routes');
 require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+
+const swaggerOptions = {
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Users Service API',
+        version: '1.0.0',
+        description: 'API de gestion des utilisateurs pour l’application de streaming.',
+      },
+      servers: [
+        {
+          url: 'http://localhost:3000',
+          description: 'Serveur local',
+        },
+      ],
+    },
+    apis: ['./routes/*.js'], // Chemin vers les fichiers où sont documentées les routes
+  };
+  
+  const swaggerDocs = swaggerJsDoc(swaggerOptions);  
 
 
 const app = express();
@@ -19,4 +41,5 @@ mongoose
   .catch((err) => console.error('Erreur de connexion à MongoDB', err));
 
 app.use('/api/users', userRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.listen(PORT, () => console.log(`Serveur lancé sur le port ${PORT}`));

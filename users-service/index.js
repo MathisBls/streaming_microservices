@@ -20,7 +20,7 @@ const swaggerOptions = {
         },
       ],
     },
-    apis: ['./routes/*.js'], // Chemin vers les fichiers où sont documentées les routes
+    apis: ['./routes/*.js'], 
   };
   
   const swaggerDocs = swaggerJsDoc(swaggerOptions);  

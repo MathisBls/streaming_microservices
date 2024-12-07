@@ -1,35 +1,87 @@
-version: '3.9'
+version: '3.8'
+
+networks:
+  api_network:
+    driver: bridge
+
 services:
   api-gateway:
     build: .
-    command: node api-gateway.js
     ports:
       - "3000:3000"
+    networks:
+      - api_network
+
+  user-service:
+    build: ./users-service/.
     depends_on:
-      - users-service
-      - video-processing-service
-      - streaming-service
-
-  users-service:
-    build: ./users-service
-    command: node index.js
-    ports:
-      - "3001:3001"
+      - mongo-user
+    networks:
+      - api_network
     environment:
-      - NODE_ENV=development
-
-  video-processing-service:
-    build: ./video-processing-service
-    command: node index.js
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=development
+      DATABASE_URL: mongodb://root:example@mongo-user:27017/userdb
 
   streaming-service:
-    build: ./streaming-service
-    command: node index.js
-    ports:
-      - "3003:3003"
+    build: ./streaming-service/.
+    depends_on:
+      - mongo-streaming
+    networks:
+      - api_network
     environment:
-      - NODE_ENV=development
+      DATABASE_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+
+  mongo-user:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - userdb-data:/data/db
+    ports:
+      - 27018:27017
+    networks:
+      - api_network
+
+  mongo-streaming:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - streamingdb-data:/data/db
+    ports:
+      - 27019:27017
+    networks:
+      - api_network
+
+  mongo-express-user:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-user:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+
+  mongo-express-streaming:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-streaming:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+
+volumes:
+  userdb-data:
+  streamingdb-data:

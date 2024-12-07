@@ -6,7 +6,9 @@ networks:
 
 services:
   api-gateway:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
     ports:
       - "3000:3000"
     networks:
@@ -20,6 +22,8 @@ services:
       - api_network
     environment:
       DATABASE_URL: mongodb://root:example@mongo-user:27017/userdb
+    ports:
+      - "3001:3001"
 
   streaming-service:
     build: ./streaming-service/.
@@ -29,6 +33,17 @@ services:
       - api_network
     environment:
       DATABASE_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+    ports:
+      - "3003:3003"
+
+  video-processing-service:
+    build: ./video-processing-service/.
+    networks:
+      - api_network
+    environment:
+      DATABASE_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+    ports:
+      - "3002:3002"
 
   mongo-user:
     image: mongo
@@ -39,7 +54,7 @@ services:
     volumes:
       - userdb-data:/data/db
     ports:
-      - 27018:27017
+      - "27018:27017"
     networks:
       - api_network
 
@@ -52,7 +67,7 @@ services:
     volumes:
       - streamingdb-data:/data/db
     ports:
-      - 27019:27017
+      - "27019:27017"
     networks:
       - api_network
 
@@ -60,7 +75,7 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
@@ -73,7 +88,7 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - 8082:8081
+      - "8082:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example

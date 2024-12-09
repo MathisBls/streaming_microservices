@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/users.routes');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
@@ -15,7 +16,7 @@ const swaggerOptions = {
       },
       servers: [
         {
-          url: 'http://localhost:3000',
+          url: 'http://localhost:3001',
           description: 'Serveur local',
         },
       ],
@@ -32,11 +33,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 
 // Connexion à MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+mongoose.connect(process.env.DATABASE_URL)
   .then(() => console.log('Connecté à MongoDB'))
   .catch((err) => console.error('Erreur de connexion à MongoDB', err));
 

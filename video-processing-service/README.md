@@ -61,7 +61,7 @@ Le service prend en charge les opérations suivantes :
 ---
 
 ### **2. Traiter les vidéos**
-- **Route** : `GET /api/videos/process`
+- **Route** : `POST /api/videos/process`
 - **Description** : Traite les vidéos téléversées
 - **Paramètre attendu** :
     ```json
@@ -75,7 +75,7 @@ Le service prend en charge les opérations suivantes :
 ---
 
 ### **3. Ajout/Mise à jour des metadata**
-- **Route** : `GET /api/videos/metadata`
+- **Route** : `POST /api/videos/metadata`
 - **Description** : Ajout ou met à jour les metadata du fichier
 - **Paramètre attendu** :
     ```json
@@ -91,7 +91,7 @@ Le service prend en charge les opérations suivantes :
 ---
 
 ### **3. Ajout/Mise à jour des metadata**
-- **Route** : `GET /api/videos/metadata`
+- **Route** : `POST /api/videos/metadata`
 - **Description** : Ajout ou met à jour les metadata du fichier
 - **Paramètre attendu** :
     ```json

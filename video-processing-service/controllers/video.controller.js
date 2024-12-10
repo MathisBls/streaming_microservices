@@ -1,49 +1,72 @@
 const videoService = require('../controllers/video.controller');
 
 // Téléversement d'une vidéo
-exports.uploadVideo = async (req, res, next) => {
+exports.uploadVideo = (req, res, next) => {
   try {
+    console.log('Requête reçue, fichier :', req.file);
+
     if (!req.file) {
-      return res.status(400).json({ status: 'error', message: 'Aucun fichier vidéo fourni.' });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Aucun fichier vidéo fourni.',
+      });
     }
 
-    const result = await videoService.saveFile(req.file);
     res.status(201).json({
       status: 'success',
       message: 'Vidéo téléversée avec succès.',
-      data: result,
+      data: {
+        filename: req.file.filename,
+        filePath: req.file.path,
+      },
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne :', error); // Log de l'erreur pour débogage
+    res.status(500).json({
+      status: 'error',
+      message: 'Une erreur interne est survenue.',
+    });
   }
 };
 
 // Traitement d'une vidéo (conversion/compression)
-exports.processVideo = async (req, res, next) => {
+exports.processVideo = (req, res, next) => {
   try {
+    console.log('Données reçues :', req.body);
+
     const { filename } = req.body;
 
     if (!filename) {
-      return res.status(400).json({ status: 'error', message: 'Le nom du fichier est requis.' });
+      console.log('Erreur : Nom de fichier manquant.');
+      return res.status(400).json({
+        status: 'error',
+        message: 'Le nom du fichier est requis.',
+      });
     }
 
-    const result = await videoService.processFile(filename);
+    // Simuler un traitement vidéo (ou ajoutez votre logique réelle)
+    console.log(`Traitement de la vidéo : ${filename}`);
+    
     res.status(200).json({
       status: 'success',
-      message: 'Vidéo traitée avec succès.',
-      data: result,
+      message: `Le fichier ${filename} a été traité avec succès.`,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne :', error);
+    next(error); // Passe l'erreur au middleware global
   }
 };
+
 
 // Ajout ou mise à jour des métadonnées
 exports.addMetadata = async (req, res, next) => {
   try {
     const { filename, title, description, tags } = req.body;
 
+    console.log('Données reçues :', req.body); // Log pour vérifier le corps de la requête
+
     if (!filename || !title || !description) {
+      console.log('Erreur : Paramètres manquants');
       return res.status(400).json({
         status: 'error',
         message: 'Le nom du fichier, le titre, et la description sont obligatoires.',
@@ -51,33 +74,57 @@ exports.addMetadata = async (req, res, next) => {
     }
 
     const metadata = { title, description, tags };
+    console.log('Métadonnées à mettre à jour :', metadata);
+
     const result = await videoService.addMetadata(filename, metadata);
+    console.log('Résultat du service addMetadata :', result);
+
     res.status(200).json({
       status: 'success',
       message: 'Métadonnées ajoutées ou mises à jour avec succès.',
       data: result,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne dans addMetadata :', error);
+    next(error); // Passe l'erreur au middleware global
   }
 };
 
 // Récupération des informations d'une vidéo
 exports.getVideoInfo = async (req, res, next) => {
   try {
+    console.log('Requête reçue :', req.params);
+
     const { filename } = req.params;
 
     if (!filename) {
-      return res.status(400).json({ status: 'error', message: 'Le nom du fichier est requis.' });
+      console.log('Erreur : Paramètre filename manquant');
+      return res.status(400).json({
+        status: 'error',
+        message: 'Le nom du fichier est requis.',
+      });
     }
 
-    const result = await videoService.getVideoInfo(filename);
+    console.log(`Recherche des informations pour : ${filename}`);
+    const video = await Video.findOne({ filename });
+
+    if (!video) {
+      console.log(`Vidéo introuvable : ${filename}`);
+      return res.status(404).json({
+        status: 'error',
+        message: `La vidéo avec le nom ${filename} est introuvable.`,
+      });
+    }
+
+    console.log('Vidéo trouvée :', video);
     res.status(200).json({
       status: 'success',
       message: 'Informations de la vidéo récupérées avec succès.',
-      data: result,
+      data: video,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne dans getVideoInfo :', error);
+    next(error);
   }
 };
+

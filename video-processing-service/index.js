@@ -37,6 +37,6 @@ app.use((err, req, res, next) => {
 
 // Démarrer le serveur
 app.listen(PORT, () => {
-  console.log(`🎥 Microservice de traitement de vidéos lancé sur http://localhost:${PORT}`);
+  console.log(`🎥 Microservice de traitement de vidéos lancé`);
   console.log(`📄 Swagger disponible sur http://localhost:${PORT}/api-docs`);
 });

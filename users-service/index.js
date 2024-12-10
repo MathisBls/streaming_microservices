@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/users.routes');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
@@ -33,7 +32,9 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 
 // Connexion à MongoDB
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(process.env.URL_DATABASE, 
+  { useNewUrlParser: true, useUnifiedTopology: true }
+)
   .then(() => console.log('Connecté à MongoDB'))
   .catch((err) => console.error('Erreur de connexion à MongoDB', err));
 

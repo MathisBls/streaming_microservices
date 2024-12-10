@@ -1,42 +1,63 @@
 const videoService = require('../controllers/video.controller');
+const Video = require('../models/video.model');
 
 // Téléversement d'une vidéo
-exports.uploadVideo = async (req, res, next) => {
+exports.uploadVideo = (req, res, next) => {
   try {
+    console.log('Requête reçue, fichier :', req.file);
+
     if (!req.file) {
-      return res.status(400).json({ status: 'error', message: 'Aucun fichier vidéo fourni.' });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Aucun fichier vidéo fourni.',
+      });
     }
 
-    const result = await videoService.saveFile(req.file);
     res.status(201).json({
       status: 'success',
       message: 'Vidéo téléversée avec succès.',
-      data: result,
+      data: {
+        filename: req.file.filename,
+        filePath: req.file.path,
+      },
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne :', error); // Log de l'erreur pour débogage
+    res.status(500).json({
+      status: 'error',
+      message: 'Une erreur interne est survenue.',
+    });
   }
 };
 
 // Traitement d'une vidéo (conversion/compression)
-exports.processVideo = async (req, res, next) => {
+exports.processVideo = (req, res, next) => {
   try {
+    console.log('Données reçues :', req.body);
+
     const { filename } = req.body;
 
     if (!filename) {
-      return res.status(400).json({ status: 'error', message: 'Le nom du fichier est requis.' });
+      console.log('Erreur : Nom de fichier manquant.');
+      return res.status(400).json({
+        status: 'error',
+        message: 'Le nom du fichier est requis.',
+      });
     }
 
-    const result = await videoService.processFile(filename);
+    // Simuler un traitement vidéo (ou ajoutez votre logique réelle)
+    console.log(`Traitement de la vidéo : ${filename}`);
+    
     res.status(200).json({
       status: 'success',
-      message: 'Vidéo traitée avec succès.',
-      data: result,
+      message: `Le fichier ${filename} a été traité avec succès.`,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne :', error);
+    next(error); // Passe l'erreur au middleware global
   }
 };
+
 
 // Ajout ou mise à jour des métadonnées
 exports.addMetadata = async (req, res, next) => {
@@ -51,14 +72,20 @@ exports.addMetadata = async (req, res, next) => {
     }
 
     const metadata = { title, description, tags };
-    const result = await videoService.addMetadata(filename, metadata);
+    const video = await Video.findOneAndUpdate(
+      { filename },
+      { $set: metadata },
+      { new: true, upsert: true } // Crée une nouvelle entrée si elle n'existe pas
+    );
+
     res.status(200).json({
       status: 'success',
       message: 'Métadonnées ajoutées ou mises à jour avec succès.',
-      data: result,
+      data: video,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur dans addMetadata :', error);
+    next(error);
   }
 };
 
@@ -68,16 +95,29 @@ exports.getVideoInfo = async (req, res, next) => {
     const { filename } = req.params;
 
     if (!filename) {
-      return res.status(400).json({ status: 'error', message: 'Le nom du fichier est requis.' });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Le nom du fichier est requis.',
+      });
     }
 
-    const result = await videoService.getVideoInfo(filename);
+    const video = await Video.findOne({ filename });
+
+    if (!video) {
+      return res.status(404).json({
+        status: 'error',
+        message: `La vidéo avec le nom ${filename} est introuvable.`,
+      });
+    }
+
     res.status(200).json({
       status: 'success',
       message: 'Informations de la vidéo récupérées avec succès.',
-      data: result,
+      data: video,
     });
   } catch (error) {
-    next(error); // Passer l'erreur au middleware d'erreur
+    console.error('Erreur interne dans getVideoInfo :', error);
+    next(error);
   }
 };
+

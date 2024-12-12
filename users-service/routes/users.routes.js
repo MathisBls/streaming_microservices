@@ -24,15 +24,10 @@ const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login } = 
  *         password:
  *           type: string
  *           description: Le mot de passe de l'utilisateur (haché)
- *         role:
- *           type: string
- *           description: Le rôle de l'utilisateur (user ou admin)
  *       example:
- *         id: 60d0fe4f5311236168a109ca
  *         username: JohnDoe
  *         email: john.doe@example.com
  *         password: hashed_password
- *         role: user
  */
 
 /**

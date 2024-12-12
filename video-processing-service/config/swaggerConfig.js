@@ -42,7 +42,7 @@ module.exports = {
                     status: 'success',
                     message: 'Vidéo téléversée avec succès.',
                     data: {
-                      filename: 'video.mp4',
+                      originalname: 'video.mp4',
                       filePath: 'uploads/video.mp4',
                     },
                   },
@@ -66,7 +66,7 @@ module.exports = {
                 schema: {
                   type: 'object',
                   properties: {
-                    filename: {
+                    originalname: {
                       type: 'string',
                       description: 'Nom du fichier vidéo à traiter.',
                     },
@@ -84,7 +84,7 @@ module.exports = {
                     status: 'success',
                     message: 'Vidéo traitée avec succès.',
                     data: {
-                      filename: 'video.mp4',
+                      originalname: 'video.mp4',
                       processed: true,
                     },
                   },
@@ -108,7 +108,7 @@ module.exports = {
                 schema: {
                   type: 'object',
                   properties: {
-                    filename: {
+                    originalname: {
                       type: 'string',
                       description: 'Nom du fichier vidéo.',
                     },
@@ -142,13 +142,13 @@ module.exports = {
           },
         },
       },
-      '/api/videos/info/{filename}': {
+      '/api/videos/info/{originalname}': {
         get: {
           summary: 'Obtenir les informations d’une vidéo',
           description: 'Récupère les métadonnées et le statut d’une vidéo existante.',
           parameters: [
             {
-              name: 'filename',
+              name: 'originalname',
               in: 'path',
               required: true,
               schema: {
@@ -166,7 +166,7 @@ module.exports = {
                     status: 'success',
                     message: 'Informations de la vidéo récupérées avec succès.',
                     data: {
-                      filename: 'video.mp4',
+                      originalname: 'video.mp4',
                       title: 'Titre Exemple',
                       description: 'Description Exemple',
                       tags: ['tag1', 'tag2'],

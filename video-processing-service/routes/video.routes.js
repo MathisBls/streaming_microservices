@@ -17,6 +17,6 @@ router.post('/process', processVideo);
 
 router.post('/metadata', addMetadata);
 
-router.get('/info/:filename', getVideoInfo);
+router.get('/info/:originalname', getVideoInfo);
 
 module.exports = router;

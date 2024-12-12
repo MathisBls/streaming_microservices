@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login } = require('../controllers/users.controller');
+const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login, validateToken } = require('../controllers/users.controller');
 
 /**
  * @swagger

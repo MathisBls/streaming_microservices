@@ -30,10 +30,10 @@ exports.createUser = async (req, res) => {
     // Hachage du mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ username, email, password: hashedPassword, role });
+    const newUser = new User({ username, email, password: hashedPassword});
     await newUser.save();
 
-    res.status(201).json({ message: 'Utilisateur créé avec succès', user: { id: newUser._id, username, email, role } });
+    res.status(201).json({ message: 'Utilisateur créé avec succès', user: { id: newUser._id, username, email} });
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la création de l'utilisateur", error: err });
   }
@@ -58,13 +58,21 @@ exports.updateUser = async (req, res) => {
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10); 
+      updateData.password = await bcrypt.hash(req.body.password, salt); 
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!updatedUser) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
 
-    res.status(200).json(updatedUser);
+    res.status(200).json({ message: 'Utilisateur mis à jour avec succès', user: updatedUser });
   } catch (err) {
+    console.error('Erreur lors de la mise à jour :', err); 
     res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'utilisateur', error: err });
   }
 };

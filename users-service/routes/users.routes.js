@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, createUser, getUserById, updateUser, deleteUser } = require('../controllers/users.controller');
+const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login } = require('../controllers/users.controller');
 /**
  * @swagger
  * components:
@@ -76,6 +76,43 @@ router.get('/', getAllUsers);
  *         description: Erreur serveur
  */
 router.post('/', createUser);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Authentifie un utilisateur
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             example:
+ *               email: john.doe@example.com
+ *               password: password123
+ *     responses:
+ *       200:
+ *         description: Connexion réussie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Mot de passe incorrect
+ *       404:
+ *         description: Utilisateur non trouvé
+ */
+router.post("/login", login);
 
 /**
  * @swagger

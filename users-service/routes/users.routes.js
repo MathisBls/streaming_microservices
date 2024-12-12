@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login } = require('../controllers/users.controller');
+const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login, validateToken } = require('../controllers/users.controller');
+
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
@@ -36,6 +42,8 @@ const { getAllUsers, createUser, getUserById, updateUser, deleteUser, login } = 
  *   get:
  *     summary: Récupérer tous les utilisateurs
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: La liste de tous les utilisateurs
@@ -107,7 +115,7 @@ router.post('/', createUser);
  *       404:
  *         description: Utilisateur non trouvé
  */
-router.post("/login", login);
+router.post('/login', login);
 
 /**
  * @swagger
@@ -115,6 +123,8 @@ router.post("/login", login);
  *   get:
  *     summary: Récupérer un utilisateur par ID
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -140,6 +150,8 @@ router.get('/:id', getUserById);
  *   put:
  *     summary: Mettre à jour un utilisateur par ID
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -179,7 +191,6 @@ router.get('/:id', getUserById);
  *       500:
  *         description: Erreur serveur
  */
-
 router.put('/:id', updateUser);
 
 /**
@@ -188,6 +199,8 @@ router.put('/:id', updateUser);
  *   delete:
  *     summary: Supprimer un utilisateur par ID
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -204,5 +217,8 @@ router.put('/:id', updateUser);
  *         description: Erreur serveur
  */
 router.delete('/:id', deleteUser);
+
+
+router.post("/validate-token", validateToken);
 
 module.exports = router;

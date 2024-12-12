@@ -218,4 +218,7 @@ router.put('/:id', updateUser);
  */
 router.delete('/:id', deleteUser);
 
+
+router.post("/validate-token", validateToken);
+
 module.exports = router;

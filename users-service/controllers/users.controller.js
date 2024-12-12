@@ -134,3 +134,14 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la connexion', error: err });
   }
 };
+
+exports.validateToken = (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ user: decoded });
+  } catch (err) {
+    res.status(401).json({ message: "Token invalide ou expiré." });
+  }
+};

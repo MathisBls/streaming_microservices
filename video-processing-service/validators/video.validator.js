@@ -23,7 +23,7 @@ exports.validateVideoUpload = (req, res, next) => {
 // Validation pour le traitement de la vidéo
 exports.validateProcessRequest = (req, res, next) => {
   const schema = Joi.object({
-    filename: Joi.string().required().messages({
+    originalname: Joi.string().required().messages({
       'any.required': 'Le nom du fichier est requis.',
       'string.empty': 'Le nom du fichier ne peut pas être vide.',
     }),
@@ -43,7 +43,7 @@ exports.validateProcessRequest = (req, res, next) => {
 
 exports.validateMetadata = (req, res, next) => {
   const schema = Joi.object({
-    filename: Joi.string().required().messages({
+    originalname: Joi.string().required().messages({
       'any.required': 'Le nom du fichier est requis.',
       'string.empty': 'Le nom du fichier ne peut pas être vide.',
     }),

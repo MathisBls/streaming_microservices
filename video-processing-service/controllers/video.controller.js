@@ -1,4 +1,5 @@
 const videoService = require('../controllers/video.controller');
+const Video = require('../models/video.model');
 
 // Téléversement d'une vidéo
 exports.uploadVideo = (req, res, next) => {
@@ -29,7 +30,7 @@ exports.uploadVideo = (req, res, next) => {
   }
 };
 
-// Traitement d'une vidéo (conversion/compression)
+// Traitement d'une vidéo
 exports.processVideo = (req, res, next) => {
   try {
     console.log('Données reçues :', req.body);
@@ -44,7 +45,7 @@ exports.processVideo = (req, res, next) => {
       });
     }
 
-    // Simuler un traitement vidéo (ou ajoutez votre logique réelle)
+    // Simuler un traitement vidéo
     console.log(`Traitement de la vidéo : ${filename}`);
     
     res.status(200).json({
@@ -63,10 +64,7 @@ exports.addMetadata = async (req, res, next) => {
   try {
     const { filename, title, description, tags } = req.body;
 
-    console.log('Données reçues :', req.body); // Log pour vérifier le corps de la requête
-
     if (!filename || !title || !description) {
-      console.log('Erreur : Paramètres manquants');
       return res.status(400).json({
         status: 'error',
         message: 'Le nom du fichier, le titre, et la description sont obligatoires.',
@@ -74,49 +72,44 @@ exports.addMetadata = async (req, res, next) => {
     }
 
     const metadata = { title, description, tags };
-    console.log('Métadonnées à mettre à jour :', metadata);
-
-    const result = await videoService.addMetadata(filename, metadata);
-    console.log('Résultat du service addMetadata :', result);
+    const video = await Video.findOneAndUpdate(
+      { filename },
+      { $set: metadata },
+      { new: true, upsert: true }
+    );
 
     res.status(200).json({
       status: 'success',
       message: 'Métadonnées ajoutées ou mises à jour avec succès.',
-      data: result,
+      data: video,
     });
   } catch (error) {
-    console.error('Erreur interne dans addMetadata :', error);
-    next(error); // Passe l'erreur au middleware global
+    console.error('Erreur dans addMetadata :', error);
+    next(error);
   }
 };
 
 // Récupération des informations d'une vidéo
 exports.getVideoInfo = async (req, res, next) => {
   try {
-    console.log('Requête reçue :', req.params);
-
     const { filename } = req.params;
 
     if (!filename) {
-      console.log('Erreur : Paramètre filename manquant');
       return res.status(400).json({
         status: 'error',
         message: 'Le nom du fichier est requis.',
       });
     }
 
-    console.log(`Recherche des informations pour : ${filename}`);
     const video = await Video.findOne({ filename });
 
     if (!video) {
-      console.log(`Vidéo introuvable : ${filename}`);
       return res.status(404).json({
         status: 'error',
         message: `La vidéo avec le nom ${filename} est introuvable.`,
       });
     }
 
-    console.log('Vidéo trouvée :', video);
     res.status(200).json({
       status: 'success',
       message: 'Informations de la vidéo récupérées avec succès.',

@@ -5,6 +5,8 @@ require('dotenv').config();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
+const PORT = process.env.PORT || 3001;
+
 const swaggerOptions = {
     definition: {
       openapi: '3.0.0',
@@ -15,19 +17,18 @@ const swaggerOptions = {
       },
       servers: [
         {
-          url: 'http://localhost:3001',
+          url: `http://localhost:${PORT}`,
           description: 'Serveur local',
         },
       ],
     },
-    apis: ['./routes/*.js'], 
+    apis: ['./routes/*.js'],
   };
-  
-  const swaggerDocs = swaggerJsDoc(swaggerOptions);  
+
+  const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 

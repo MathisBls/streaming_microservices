@@ -9,7 +9,6 @@ exports.validateVideoUpload = (req, res, next) => {
     });
   }
 
-  // Vérifie si le type MIME du fichier est valide
   const allowedMimeTypes = ['video/mp4', 'video/avi', 'video/mkv', 'video/quicktime'];
   if (!allowedMimeTypes.includes(req.file.mimetype)) {
     return res.status(400).json({
@@ -69,5 +68,5 @@ exports.validateMetadata = (req, res, next) => {
     });
   }
 
-  next(); // Passe au middleware ou contrôleur suivant
+  next();
 };

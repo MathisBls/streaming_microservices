@@ -30,7 +30,7 @@ exports.uploadVideo = (req, res, next) => {
   }
 };
 
-// Traitement d'une vidéo (conversion/compression)
+// Traitement d'une vidéo
 exports.processVideo = (req, res, next) => {
   try {
     console.log('Données reçues :', req.body);
@@ -45,7 +45,7 @@ exports.processVideo = (req, res, next) => {
       });
     }
 
-    // Simuler un traitement vidéo (ou ajoutez votre logique réelle)
+    // Simuler un traitement vidéo
     console.log(`Traitement de la vidéo : ${filename}`);
     
     res.status(200).json({
@@ -75,7 +75,7 @@ exports.addMetadata = async (req, res, next) => {
     const video = await Video.findOneAndUpdate(
       { filename },
       { $set: metadata },
-      { new: true, upsert: true } // Crée une nouvelle entrée si elle n'existe pas
+      { new: true, upsert: true }
     );
 
     res.status(200).json({

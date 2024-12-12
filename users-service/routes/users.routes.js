@@ -79,7 +79,7 @@ router.post('/', createUser);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/users/login:
  *   post:
  *     summary: Authentifie un utilisateur
  *     tags: [Auth]

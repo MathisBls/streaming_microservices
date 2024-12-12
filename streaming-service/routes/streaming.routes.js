@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multerConfig = require('../utils/multerConfig');
 const streamingController = require('../controllers/streaming.controller');
+const { authMiddleware } = require('../middleware/auth.middleware'); // Middleware d'authentification
 
 /**
  * @swagger
@@ -9,6 +10,8 @@ const streamingController = require('../controllers/streaming.controller');
  *   get:
  *     summary: Obtenir toutes les vidéos
  *     description: Récupère la liste des vidéos disponibles dans la base de données.
+ *     security:
+ *       - bearerAuth: [] # Ajout de l'exigence de token pour Swagger
  *     responses:
  *       200:
  *         description: Liste de toutes les vidéos disponibles
@@ -32,10 +35,12 @@ const streamingController = require('../controllers/streaming.controller');
  *                   createdAt:
  *                     type: string
  *                     format: date-time
+ *       401:
+ *         description: Accès refusé. Token manquant ou invalide.
  *       500:
  *         description: Erreur serveur lors de la récupération des vidéos
  */
-router.get('/videos', streamingController.getAllVideos);
+router.get('/videos', authMiddleware, streamingController.getAllVideos); // Applique le middleware
 
 /**
  * @swagger
@@ -45,6 +50,8 @@ router.get('/videos', streamingController.getAllVideos);
  *     description: >
  *       Téléverse une vidéo et enregistre ses métadonnées dans la base de données.  
  *       Les noms de fichiers sont nettoyés automatiquement pour éviter les erreurs.
+ *     security:
+ *       - bearerAuth: [] # Ajout de l'exigence de token pour Swagger
  *     requestBody:
  *       required: true
  *       content:
@@ -90,18 +97,12 @@ router.get('/videos', streamingController.getAllVideos);
  *                       format: date-time
  *       400:
  *         description: Erreur de validation ou fichier manquant
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Aucun fichier vidéo fourni
+ *       401:
+ *         description: Accès refusé. Token manquant ou invalide.
  *       500:
  *         description: Erreur interne lors du téléversement de la vidéo
  */
-router.post('/upload', multerConfig.single('video'), streamingController.uploadVideo);
+router.post('/upload', authMiddleware, multerConfig.single('video'), streamingController.uploadVideo);
 
 /**
  * @swagger
@@ -111,7 +112,8 @@ router.post('/upload', multerConfig.single('video'), streamingController.uploadV
  *     description: >
  *       Cet endpoint diffuse une vidéo en streaming.  
  *       **Note :** Swagger ne peut pas afficher directement les vidéos.  
- *       Cliquez [ici](http://localhost:3003/api/streaming/test/{filename}) pour tester dynamiquement la vidéo.
+ *     security:
+ *       - bearerAuth: [] # Ajout de l'exigence de token pour Swagger
  *     parameters:
  *       - in: path
  *         name: filename
@@ -128,75 +130,23 @@ router.post('/upload', multerConfig.single('video'), streamingController.uploadV
  *             schema:
  *               type: string
  *               format: binary
+ *       401:
+ *         description: Accès refusé. Token manquant ou invalide.
  *       404:
  *         description: Vidéo non trouvée
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Vidéo non trouvée
  *       400:
  *         description: Mauvaise requête (par exemple, Range manquant)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Range header manquant
  */
 router.get('/stream/:filename', streamingController.streamVideo);
 
-/**
- * @swagger
- * /api/streaming/test/{filename}:
- *   get:
- *     summary: Tester la diffusion d'une vidéo
- *     description: Redirection vers une page HTML dynamique pour tester la diffusion de vidéos.
- *     parameters:
- *       - in: path
- *         name: filename
- *         required: true
- *         description: Nom du fichier vidéo
- *         schema:
- *           type: string
- *           example: "Arcane-Bande-annonce-officielle.mp4"
- *     responses:
- *       200:
- *         description: Page de test affichée avec succès
- */
-router.get('/test/:filename', (req, res) => {
-    const filename = req.params.filename;
-    res.send(`
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Test de Streaming Vidéo</title>
-      </head>
-      <body>
-        <h1>Test de Streaming Vidéo</h1>
-        <video controls width="800">
-          <source src="/api/streaming/stream/${filename}" type="video/mp4">
-          Votre navigateur ne supporte pas le lecteur vidéo.
-        </video>
-        <p>Vidéo : ${filename}</p>
-      </body>
-      </html>
-    `);
-  });
-  
 /**
  * @swagger
  * /api/streaming/videos/{id}:
  *   put:
  *     summary: Mettre à jour une vidéo
  *     description: Met à jour les métadonnées (titre, description) d'une vidéo.
+ *     security:
+ *       - bearerAuth: [] # Ajout de l'exigence de token pour Swagger
  *     parameters:
  *       - in: path
  *         name: id
@@ -220,12 +170,14 @@ router.get('/test/:filename', (req, res) => {
  *     responses:
  *       200:
  *         description: Vidéo mise à jour avec succès
+ *       401:
+ *         description: Accès refusé. Token manquant ou invalide.
  *       404:
  *         description: Vidéo non trouvée
  *       500:
  *         description: Erreur lors de la mise à jour
  */
-router.put('/videos/:id', streamingController.updateVideo);
+router.put('/videos/:id', authMiddleware, streamingController.updateVideo);
 
 /**
  * @swagger
@@ -233,6 +185,8 @@ router.put('/videos/:id', streamingController.updateVideo);
  *   delete:
  *     summary: Supprimer une vidéo
  *     description: Supprime une vidéo (fichier et métadonnées) de la base de données.
+ *     security:
+ *       - bearerAuth: [] # Ajout de l'exigence de token pour Swagger
  *     parameters:
  *       - in: path
  *         name: id
@@ -243,12 +197,37 @@ router.put('/videos/:id', streamingController.updateVideo);
  *     responses:
  *       200:
  *         description: Vidéo supprimée avec succès
+ *       401:
+ *         description: Accès refusé. Token manquant ou invalide.
  *       404:
  *         description: Vidéo non trouvée
  *       500:
  *         description: Erreur lors de la suppression
  */
-router.delete('/videos/:id', streamingController.deleteVideo);
+router.delete('/videos/:id', authMiddleware, streamingController.deleteVideo);
+
+router.get('/test/:filename', (req, res) => {
+  const filename = req.params.filename;
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Test de Streaming Vidéo</title>
+    </head>
+    <body>
+      <h1>Test de Streaming Vidéo</h1>
+      <video controls width="800">
+        <source src="/api/streaming/stream/${filename}" type="video/mp4">
+        Votre navigateur ne supporte pas le lecteur vidéo.
+      </video>
+      <p>Vidéo : ${filename}</p>
+    </body>
+    </html>
+  `);
+});
+
 
 
 module.exports = router;

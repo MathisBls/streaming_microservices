@@ -16,6 +16,20 @@ const swaggerOptions = {
         description: 'Serveur Local',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT', 
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [], // Applique le schéma par défaut à toutes les routes
+      },
+    ],
   },
   apis: ['./routes/*.js'],
 };

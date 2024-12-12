@@ -5,6 +5,8 @@ networks:
     driver: bridge
 
 services:
+
+  # API Gateway
   api-gateway:
     build:
       context: .
@@ -13,7 +15,9 @@ services:
       - "3000:3000"
     networks:
       - api_network
+    restart: always
 
+  # User Service
   user-service:
     build: ./users-service/.
     depends_on:
@@ -21,10 +25,12 @@ services:
     networks:
       - api_network
     environment:
-      DATABASE_URL: mongodb://root:example@mongo-user:27017/userdb
+      DATABASE_URL: ${MONGO_USER_URI}
     ports:
       - "3001:3001"
+    restart: always
 
+  # Streaming Service
   streaming-service:
     build: ./streaming-service/.
     depends_on:
@@ -32,19 +38,25 @@ services:
     networks:
       - api_network
     environment:
-      DATABASE_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+      DATABASE_URL: ${MONGO_STREAMING_URI}
     ports:
       - "3003:3003"
+    restart: always
 
+  # Video Processing Service
   video-processing-service:
     build: ./video-processing-service/.
+    depends_on:
+      - mongo-streaming
     networks:
       - api_network
     environment:
-      DATABASE_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+      DATABASE_URL: ${MONGO_VIDEO_URI}
     ports:
       - "3002:3002"
+    restart: always
 
+  # MongoDB pour User Service
   mongo-user:
     image: mongo
     restart: always
@@ -58,6 +70,7 @@ services:
     networks:
       - api_network
 
+  # MongoDB pour Streaming Service
   mongo-streaming:
     image: mongo
     restart: always
@@ -71,6 +84,7 @@ services:
     networks:
       - api_network
 
+  # Mongo-Express pour User Service
   mongo-express-user:
     image: mongo-express
     restart: always
@@ -79,11 +93,12 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-user:27017/
-      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-user:27017/userdb
+      ME_CONFIG_BASICAUTH: "false"
     networks:
       - api_network
 
+  # Mongo-Express pour Streaming Service
   mongo-express-streaming:
     image: mongo-express
     restart: always
@@ -92,8 +107,8 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-streaming:27017/
-      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-streaming:27017/streamingdb
+      ME_CONFIG_BASICAUTH: "false"
     networks:
       - api_network
 

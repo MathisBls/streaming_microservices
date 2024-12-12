@@ -67,7 +67,7 @@ Le service prend en charge les opérations suivantes :
     ```json
   [
     {
-    "filename" : "example.mp4"
+    "originalname" : "example.mp4"
     }
   ]
   ```
@@ -81,7 +81,7 @@ Le service prend en charge les opérations suivantes :
     ```json
   [
     {
-  "filename": "example.mp4",
+  "originalname": "example.mp4",
   "title": "titre de la video",
   "description": "description video",
   "tags": ["tag1", "tag2", "tag3"]
@@ -97,7 +97,7 @@ Le service prend en charge les opérations suivantes :
     ```json
   [
     {
-  "filename": "example.mp4",
+  "originalname": "example.mp4",
   "title": "titre de la video",
   "description": "description video",
   "tags": ["tag1", "tag2", "tag3"]
@@ -118,7 +118,7 @@ Le service prend en charge les opérations suivantes :
     "message": "Informations de la vidéo récupérées avec succès.",
     "data": {
         "_id": "id généré automatiquement",
-        "filename": "example.mp4",
+        "originalname": "example.mp4",
         "__v": 0,
         "description": "description video",
         "tags": [

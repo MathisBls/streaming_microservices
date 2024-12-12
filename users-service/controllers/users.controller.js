@@ -19,7 +19,7 @@ exports.createUser = async (req, res) => {
   }
 
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
 
     // Vérification si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
